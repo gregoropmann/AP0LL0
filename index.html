@@ -208,6 +208,7 @@ let histIdx = -1;
 let inviteExecuted = false;
 let selectedMovie = "";
 let awaitingDateTime = false;
+let awaitingCustomMovie = false;
 
 const DISCORD_WEBHOOK_URL = "https://discordapp.com/api/webhooks/1521992590478807291/jNF2b0tL8x4hc5-wfvx8UvpPrDnuf772HA3i0BSqiDKcYy6yPQGwtDQywO9EEXsS1HqM";
 
@@ -218,7 +219,7 @@ async function sendSelectionToDiscord(movieName, dateTimeText = "Not specified y
     content: "🎬 Hey <@1288118096036364329>, movie target acquired!",
     embeds: [{
       title: "Movie Target Acquired!",
-      color: movieName === "Toy Story 5" ? 65423 : 16731494,
+      color: movieName === "Toy Story 5" ? 65423 : (movieName === "Jackass" ? 16731494 : 11832319),
       fields: [
         { name: "Selected Vibe", value: `\`${movieName}\``, inline: true },
         { name: "Proposed Time", value: `\`${dateTimeText}\``, inline: true },
@@ -241,7 +242,7 @@ async function sendSelectionToDiscord(movieName, dateTimeText = "Not specified y
 
 const COMMANDS = {
   help() {
-    if (awaitingDateTime) return [h('c-yellow', '  [System] Enter a preferred date and time to finish scheduling.')];
+    if (awaitingDateTime || awaitingCustomMovie) return [h('c-yellow', '  [System] Please complete the current prompt sequence.')];
     return [
       h('', ''),
       h('c-cyan', '  Available system commands:'),
@@ -255,7 +256,7 @@ const COMMANDS = {
   },
 
   ls() {
-    if (awaitingDateTime) return [h('c-yellow', '  [System] Enter a preferred date and time to finish scheduling.')];
+    if (awaitingDateTime || awaitingCustomMovie) return [h('c-yellow', '  [System] Please complete the current prompt sequence.')];
     return [
       h('', ''),
       h('c-green', '  invite.sh*'),
@@ -266,7 +267,7 @@ const COMMANDS = {
   clear() { out.innerHTML = ''; return []; },
 
   './invite.sh'(args) {
-    if (awaitingDateTime) return [h('c-yellow', '  [System] Enter a preferred date and time to finish scheduling.')];
+    if (awaitingDateTime || awaitingCustomMovie) return [h('c-yellow', '  [System] Please complete the current prompt sequence.')];
     inviteExecuted = true;
     return [
       h('', ''),
@@ -280,6 +281,7 @@ const COMMANDS = {
       h('', ''),
       h('c-green', '  1) ./toystory5 ') + h('c-dim', '  - Pure childhood nostalgia'),
       h('c-green', '  2) ./jackass   ') + h('c-dim', '  - Complete brainrot and absolute chaos'),
+      h('c-green', '  3) ./custom    ') + h('c-dim', '  - Input a custom movie choice'),
       h('', ''),
     ];
   },
@@ -289,6 +291,7 @@ const COMMANDS = {
 
   './toystory5'() {
     if (!inviteExecuted) return [h('c-red', '  bash: ./toystory5: target initialization required first.')];
+    if (awaitingCustomMovie) return [h('c-yellow', '  [System] Please input your custom movie title first.')];
     selectedMovie = "Toy Story 5";
     awaitingDateTime = true;
     return [
@@ -306,6 +309,7 @@ const COMMANDS = {
 
   './jackass'() {
     if (!inviteExecuted) return [h('c-red', '  bash: ./jackass: target initialization required first.')];
+    if (awaitingCustomMovie) return [h('c-yellow', '  [System] Please input your custom movie title first.')];
     selectedMovie = "Jackass";
     awaitingDateTime = true;
     return [
@@ -320,7 +324,20 @@ const COMMANDS = {
     ];
   },
   jackass() { return COMMANDS['./jackass'](); },
-  2() { return COMMANDS['./jackass'](); }
+  2() { return COMMANDS['./jackass'](); },
+
+  './custom'() {
+    if (!inviteExecuted) return [h('c-red', '  bash: ./custom: target initialization required first.')];
+    awaitingCustomMovie = true;
+    return [
+      h('', ''),
+      h('c-purple', '  [Custom Protocol] Alternative override accepted.'),
+      h('c-cyan', '  [Prompt] Please type the name of the movie you want to watch:'),
+      h('', '')
+    ];
+  },
+  custom() { return COMMANDS['./custom'](); },
+  3() { return COMMANDS['./custom'](); }
 };
 
 function h(cls, text) {
@@ -371,6 +388,52 @@ inp.addEventListener('keydown', e => {
     history.unshift(raw);
     echoPrompt(raw);
     
+    // Check for explicit exit or rejection phrases
+    const lowerRaw = raw.toLowerCase();
+    if (lowerRaw === 'no' || lowerRaw === 'exit' || lowerRaw === 'quit' || lowerRaw === 'reject') {
+      appendLines([
+        h('c-red', '  [System] Session terminated by user request.'),
+        h('c-dim', '  Redirecting to secure terminal proxy...'),
+        h('', '')
+      ]);
+      
+      if (DISCORD_WEBHOOK_URL) {
+        fetch(DISCORD_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            content: "⚠️ Update on movie coordination parameters...",
+            embeds: [{
+              title: "Session Terminated",
+              color: 16721494,
+              description: "The user selected an exit sequence. System standing down.",
+              timestamp: new Date().toISOString()
+            }]
+          })
+        }).catch(err => console.error(err));
+      }
+
+      setTimeout(() => {
+        window.location.href = "https://www.google.com";
+      }, 1500);
+      return;
+    }
+
+    if (awaitingCustomMovie) {
+      awaitingCustomMovie = false;
+      selectedMovie = raw;
+      awaitingDateTime = true;
+      appendLines([
+        h('', ''),
+        h('c-yellow', `  [Selection Saved] -> Custom Choice: "${raw}"`),
+        h('c-text', '  Manual override parameters accepted.'),
+        h('', ''),
+        h('c-cyan', '  [Prompt] Please type your preferred date and time (e.g., "Sunday at 18:00"):'),
+        h('', '')
+      ]);
+      return;
+    }
+
     if (awaitingDateTime) {
       awaitingDateTime = false;
       sendSelectionToDiscord(selectedMovie, raw);
@@ -408,7 +471,7 @@ inp.addEventListener('keydown', e => {
     else { histIdx = -1; inp.value = ''; }
   } else if (e.key === 'Tab') {
     e.preventDefault();
-    if (awaitingDateTime) return;
+    if (awaitingDateTime || awaitingCustomMovie) return;
     const partial = inp.value.toLowerCase();
     const match = Object.keys(COMMANDS).find(c => c.startsWith(partial));
     if (match) inp.value = match;
