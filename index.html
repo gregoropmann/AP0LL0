@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Terminal — System Invitation</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="https://www.apollokino.ee/inc/favicon/favicon-32x32.png" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -133,12 +133,12 @@
     <div class="dot close"></div>
     <div class="dot min"></div>
     <div class="dot max"></div>
-    <span class="title-text">guest@Apollo</span>
+    <span class="title-text">guest@gregoropmann-os — bash</span>
   </div>
   <div id="output"></div>
   <div class="input-row">
     <span class="prompt-static">
-      <span class="ps-user">guest</span><span class="ps-at">@</span><span class="ps-host">Apollo</span><span class="ps-colon">:</span><span class="ps-path">~</span><span class="ps-dollar">$</span>
+      <span class="ps-user">guest</span><span class="ps-at">@</span><span class="ps-host">gregoropmann-os</span><span class="ps-colon">:</span><span class="ps-path">~</span><span class="ps-dollar">$</span>
     </span>
     <input id="cmd-input" type="text" autocomplete="off" spellcheck="false" autofocus/>
   </div>
@@ -231,7 +231,7 @@ const COMMANDS = {
       h('', ''),
       h('c-yellow', '  [Selection Saved] -> Toy Story 5'),
       h('c-text', '  Excellent choice. Childhood nostalgia route secured.'),
-      h('c-text', '  Pacing strategy recommended: Choose a reasonably sized drink.'),
+      h('c-text', '  Pacing strategy recommended: Choose a reasonable sized drink.'),
       h('c-dim', '  Transmission sent! Coordination protocols initialized.'),
       h('', '')
     ];
@@ -246,7 +246,7 @@ const COMMANDS = {
       h('', ''),
       h('c-red', '  [Selection Saved] -> Jackass'),
       h('c-text', '  Absolute brainrot route initialized.'),
-      h('c-text', '  Emergency notice: Guard duty protocols for bushes have been updated.'),
+      h('c-text', '  Emergency notice: Guard duty protocols for mall bushes have been updated.'),
       h('c-dim', '  Transmission sent! Coordination protocols initialized.'),
       h('', '')
     ];
@@ -283,7 +283,7 @@ function boot() {
     `<span class="line boot-line c-cyan" style="animation-delay:.25s">  ██║  ██║██║     ╚██████╔╝███████╗███████╗╚██████╔╝</span>`,
     `<span class="line boot-line c-dim"   style="animation-delay:.30s">  ╚═╝  ╚═╝╚═╝      ╚═════╝ ╚══════╝╚══════╝ ╚═════╝ </span>`,
     `<span class="line boot-line" style="animation-delay:.40s"> </span>`,
-    `<span class="line boot-line c-yellow" style="animation-delay:.50s">  Welcome to the invitation (Session: Python_Alumni)</span>`,
+    `<span class="line boot-line c-yellow" style="animation-delay:.50s">  Welcome to GregorOpmannOS (Session: Python_Alumni)</span>`,
     `<span class="line boot-line c-dim"    style="animation-delay:.60s">  Type <span class="c-green">help</span> or <span class="c-green">ls</span> to inspect system assets.</span>`,
     `<span class="line boot-line" style="animation-delay:.65s"> </span>`,
   ];
